@@ -47,6 +47,8 @@
   mysql_user:
     login_host: localhost
     config_file: "{{ mysql_user_home }}/.my.cnf"
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
     name: ""
     host: "{{ item }}"
     state: absent
@@ -57,7 +59,7 @@
 - name: Remove MySQL test database.
   mysql_db:
     login_host: localhost
-    config_file: "{{ mysql_user_home}}/.my.cnf"
+    config_file: "{{ mysql_user_home }}/.my.cnf"
     login_user: root
     login_password: "{{ mysql_root_password }}"
     name: test
