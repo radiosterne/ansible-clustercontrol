@@ -41,7 +41,7 @@
 
 - name: Install ClusterControl API token.
   shell: >
-    mysql -u root -NBe
+    mysql -u root --password="{{ mysql_root_password }}" -NBe
     "REPLACE INTO dcps.apis
     (id, company_id, user_id, url, token)
     VALUES
@@ -54,7 +54,7 @@
 
 - name: Configure ClusterControl admin credentials.
   shell: >
-    mysql -u root -NBe
+    mysql -u root --password="{{ mysql_root_password }}" -NBe
     "SET @salt := (SELECT SUBSTR(CONCAT(MD5(RAND()),MD5(RAND())),1,40));
     REPLACE INTO dcps.users
     (id, company_id, email, password, sa, created, salt, uuid, email_verified)
@@ -71,7 +71,7 @@
 
 - name: Configure ClusterControl license.
   shell: >
-    mysql -u root -NBe
+    mysql -u root --password="{{ mysql_root_password }}" -NBe
     "REPLACE INTO cmon.license
     (email, company, exp_date, lickey)
     VALUES
@@ -88,7 +88,7 @@
 
 - name: Configure ClusterControl LDAP settings.
   shell: >
-    mysql -u root -NBe
+    mysql -u root --password="{{ mysql_root_password }}" -NBe
     "REPLACE INTO dcps.ldap_settings
     (id, enable_ldap_auth, host, port, login, base_dsn, user_dn, group_dn)
     VALUES
