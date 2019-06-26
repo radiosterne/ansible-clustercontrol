@@ -248,6 +248,7 @@
 
 - name: Remove temp local known_hosts copies.
   local_action: file dest="tmp/clustercontrol/key.pub" state=absent
+  become: no
 
 - name: Copy cmon.cnf - ClusterControl Controller configuration.
   template:
