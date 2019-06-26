@@ -22,7 +22,7 @@
     mode: 0600
 
 - name: Disallow root login remotely
-  command: 'mysql -u root -NBe -p"{{ mysql_root_password }}" "{{ item }}"'
+  command: 'mysql -u root --password="{{ mysql_root_password }}" -NBe  "{{ item }}"'
   with_items:
     - DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1')
   changed_when: False
@@ -30,14 +30,14 @@
   become_user: "{{ cmon_ssh_user }}"
 
 - name: Get list of hosts for the root user.
-  command: mysql -u root -p"{{ mysql_root_password }}" -NBe 'SELECT Host FROM mysql.user WHERE User = "root" ORDER BY (Host="localhost") ASC'
+  command: mysql -u root --password="{{ mysql_root_password }}" -NBe 'SELECT Host FROM mysql.user WHERE User = "root" ORDER BY (Host="localhost") ASC'
   register: mysql_root_hosts
   changed_when: false
   become: yes
   become_user: "{{ cmon_ssh_user }}"
 
 - name: Get list of hosts for the anonymous user.
-  command: mysql -u root -p"{{ mysql_root_password }}" -NBe 'SELECT Host FROM mysql.user WHERE User = ""'
+  command: mysql -u root --password="{{ mysql_root_password }}" -NBe 'SELECT Host FROM mysql.user WHERE User = ""'
   register: mysql_anonymous_hosts
   changed_when: false
   become: yes
@@ -64,14 +64,14 @@
   become_user: "{{ cmon_ssh_user }}"
 
 - name: Check if ClusterControl Controller database is exist.
-  command: mysqlshow -u root -p"{{ mysql_root_password }}" 'cmon' 'hosts'
+  command: mysqlshow -u root --password="{{ mysql_root_password }}" 'cmon' 'hosts'
   register: cmon_db
   ignore_errors: yes
   become: yes
   become_user: "{{ cmon_ssh_user }}"
 
 - name: Check if ClusterControl UI database is exist.
-  command: mysqlshow -u root -p"{{ mysql_root_password }}" 'dcps' 'apis'
+  command: mysqlshow -u root --password="{{ mysql_root_password }}" 'dcps' 'apis'
   register: dcps_db
   ignore_errors: yes
   become: yes
@@ -79,15 +79,15 @@
 
 - name: Import ClusterControl Controller database.
   shell:
-    mysql -u root -p"{{ mysql_root_password }}" < "{{ cmon_sql_path }}/cmon_db.sql" &&
-    mysql -u root -p"{{ mysql_root_password }}" < "{{ cmon_sql_path }}/cmon_data.sql"
+    mysql -u root --password="{{ mysql_root_password }}" < "{{ cmon_sql_path }}/cmon_db.sql" &&
+    mysql -u root --password="{{ mysql_root_password }}" < "{{ cmon_sql_path }}/cmon_data.sql"
   register: cmon_db_import
   when: "'Unknown' in cmon_db.stderr"
   become: yes
   become_user: "{{ cmon_ssh_user }}"
 
 - name: Import ClusterControl UI database.
-  shell: mysql -u root -p"{{ mysql_root_password }}" < {{ apache_doc_root }}/clustercontrol/sql/dc-schema.sql
+  shell: mysql -u root --password="{{ mysql_root_password }}" < {{ apache_doc_root }}/clustercontrol/sql/dc-schema.sql
   register: ccui_db_import
   when:
     ("'Unknown' in dcps_db.stderr") or
